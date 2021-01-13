@@ -3723,6 +3723,80 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SelectSubGridRecord(string subgridName, int index = 0)
+        {
+            return this.Execute(GetOptions($"Select Subgrid record for subgrid {subgridName}"), driver =>
+            {
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+
+                // Find list of SubGrid records
+                IWebElement subGridRecordList = null;
+                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+
+                // Read Only Grid Found
+                if (subGridRecordList != null && foundGrid)
+                {
+                    var rows = subGrid.FindElements(By.CssSelector("div.wj-row[role=row][data-lp-id]"));
+
+                    if (rows.Count == 0)
+                    {
+                        throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
+                    }
+
+                    if (index + 1 > rows.Count)
+                    {
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {rows.Count}. Expected: {index + 1}");
+                    }
+
+                    rows[index].FindElement(By.TagName("div")).Click();
+                    driver.WaitForTransaction();
+
+                    return true;
+                }
+                else if (!foundGrid)
+                {
+                    // Read Only Grid Not Found
+                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+
+                    if (foundEditableGrid)
+                    {
+                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+
+                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+
+                        var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+
+                        Actions actions = new Actions(driver);
+                        actions.Click(editableGridCellRow[1]).Perform();
+
+                        driver.WaitForTransaction();
+
+                        return true;
+                    }
+                    else
+                    {
+                        // Editable Grid Not Found
+                        // Check for special 'Related' grid form control
+                        // This opens a limited form view in-line on the grid
+
+                        //Get the GridName
+                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
+
+                        //cell-0 is the checkbox for each record
+                        var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+
+                        driver.Click(checkBox);
+
+                        driver.WaitForTransaction();
+                    }
+                }
+
+                return true;
+
+            });
+        }
+
         internal BrowserCommandResult<int> GetSubGridItemsCount(string subgridName)
         {
             return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid {subgridName}"), driver =>
