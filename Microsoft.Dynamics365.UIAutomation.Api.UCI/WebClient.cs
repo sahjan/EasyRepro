@@ -3732,7 +3732,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 // Find list of SubGrid records
                 IWebElement subGridRecordList = null;
-                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.ReadOnlySubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
                 // Read Only Grid Found
                 if (subGridRecordList != null && foundGrid)
@@ -3753,6 +3753,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.WaitForTransaction();
 
                     return true;
+
                 }
                 else if (!foundGrid)
                 {
@@ -3776,24 +3777,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                     else
                     {
-                        // Editable Grid Not Found
-                        // Check for special 'Related' grid form control
-                        // This opens a limited form view in-line on the grid
-
-                        //Get the GridName
-                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
-
-                        //cell-0 is the checkbox for each record
-                        var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
-
-                        driver.Click(checkBox);
-
-                        driver.WaitForTransaction();
+                        //Read-only and editable grid not found
+                        throw new NotFoundException($"No read-only or editable subgrid {subgridName} found.");
                     }
                 }
-
                 return true;
-
             });
         }
 

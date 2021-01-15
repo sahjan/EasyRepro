@@ -66,6 +66,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Select a record on a subgrid
+        /// </summary>
+        /// <param name="subgridName">schemaName of the SubGrid control</param>
+        /// <param name="index">Index of the record to select</param>
+        public void SelectSubGridRecord(string subgridName, int index = 0)
+        {
+            _client.SelectSubGridRecord(subgridName, index);
+        }
+
+        /// <summary>
         /// Performs a Search on the subgrid
         /// </summary>
         /// <param name="searchCriteria">Search term</param>

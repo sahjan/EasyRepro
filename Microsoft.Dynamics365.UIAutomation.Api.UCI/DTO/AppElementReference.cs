@@ -117,6 +117,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridTitle = "Entity_SubGridTitle";
             public static string SubGridContents = "Entity_SubGridContents";
             public static string SubGridList = "Entity_SubGridList";
+            public static string ReadOnlySubGridList = "Entity_ReadOnlySubGridList";
             public static string SubGridViewPickerButton = "Entity_SubGridViewPickerButton";
             public static string SubGridViewPickerFlyout = "Entity_SubGridViewPickerFlyout";
             public static string SubGridCommandBar = "Entity_SubGridCommandBar";
@@ -431,6 +432,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]" },
             { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
             { "Entity_SubGridList", ".//ul[contains(@id, \"[NAME]-GridList\")]" },
+            { "Entity_ReadOnlySubGridList","//div[contains(@data-lp-id,'ReadOnlyGrid') and contains(@data-lp-id,'[NAME]')]"},
             { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@role, 'button')]" },
             { "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
             { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
